@@ -1,14 +1,24 @@
 # SETUP UTILS
 
-export PATH="/usr/local/bin:${PATH}"
-export NVM_DIR="$HOME/.nvm"
-. "$(brew --prefix nvm)/nvm.sh"
+export PATH="/usr/local/bin:${PATH}";
+#export NVM_DIR="$HOME/.nvm"
+#. "$(brew --prefix nvm)/nvm.sh"
 
 # red-colored terminal prompt with current dir and git branch (if applicable)
-export PS1="\[\033[1;91m\]\w\[\033[0m\]\[\033[97m\]\$(parse_git_branch)\[\033[00m\]\[\033[0;91m\] $ \[\033[0m\]"
+# export PS1="\[\033[1;91m\]\w\[\033[0m\]\[\033[97m\]\$(parse_git_branch)\[\033[00m\]\[\033[0;91m\] $ \[\033[0m\]";
+# Load version control information
+autoload -Uz vcs_info
+precmd() { vcs_info }
 
-ulimit -n 10000;
-source ~/.git-completion.bash
+# Format the vcs_info_msg_0_ variable
+zstyle ':vcs_info:git:*' formats '(%F{white}%b%F{red})'
+ 
+# Set up the prompt (with git branch name)
+setopt PROMPT_SUBST
+PROMPT='%F{red}%d ${vcs_info_msg_0_} $%F{white}'
+
+#ulimit -n 10000;
+#source ~/.git-completion.bash
 
 parse_git_branch() {
     # current branch in parentheses
@@ -32,12 +42,12 @@ alias gcl='git clone';
 alias g='git';
 alias go="git checkout";
 alias gco="git checkout";
-alias tossh="git remote set-url origin"
-alias todev="git checkout develop"
-alias haskell="stack ghci"
-alias cabal="stack cabal"
-alias makevenv="python3 -m venv env";
-alias usevenv="source env/bin/activate"
+alias tossh="git remote set-url origin";
+alias todev="git checkout develop";
+
+gclssh() {
+    git clone git@"$1":"$2";
+}
 
 runflask() {
     FLASK_APP="$1" FLASK_ENV=development flask run;
@@ -62,7 +72,7 @@ dbranch() {
     git checkout -b "$1";
 }
 
-gcm() {
+gcom() {
     # adds current branch before commit message and then commits it
     local branch_name=$(git_branch_name);
     git commit -m "$branch_name $1";
@@ -84,11 +94,11 @@ firstpush() {
 
 ## bash profile
 # reloads terminal with aliases
-alias bshr='source ~/.bash_profile';
-alias bashr='source ~/.bash_profile';
-# opens bash_profile in atom
-alias bshed='atom ~/.bash_profile';
-alias bashed='atom ~/.bash_profile';
+alias bshr='source ~/.aliases';
+alias bashr='source ~/.aliases';
+# opens bash_profile in code
+alias bshed='code ~/.aliases';
+alias bashed='code ~/.aliases';
 
 ##npm
 alias npmi="npm install";
@@ -101,11 +111,20 @@ alias node012="nvm use 0.12";
 
 ## utilities
 alias sim="open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app";
-alias chrome="open -a \"Google Chrome\"";
+# alias chrome="open -a \"Google Chrome\"";
 alias c="clear";
 alias lsa="ls -a";
 alias ngrok="~/Documents/ngrok"
 alias lsgrp="lsgrep";
+alias toc="cd /mnt/c";
+alias toproj="cd /mnt/c/Projects";
+alias linproj="cd ~/projects";
+alias todesk="cd /mnt/c/Users/13236/Desktop/";
+alias mountd="sudo mount -t drvfs D: /mnt/d";
+
+mountdr() {
+    sudo mount -t drvfs "$1": /mnt/"$1"
+}
 
 mkcd() {
     # makes a new directory and immediatly goes into it
@@ -118,6 +137,54 @@ lsgrep() {
     ls -a | grep "$1";
 }
 
+mvfromdown() {
+    mv /mnt/c/Users/13236/Downloads/"$1" "$2"
+}
+
+mvfromdesk() {
+    mv /mnt/c/Users/13236/Desktop/"$1" "$2"
+}
+
+mvtodesk() {
+    mv "$1" /mnt/c/Users/13236/Desktop/"$2"
+}
+
+cptodesk() {
+    cp "$1" /mnt/c/Users/13236/Desktop/"$2"
+}
+
+## conda
+alias newconda="conda create --name";
+alias useconda="conda activate";
+alias killconda="conda deactivate";
+alias listconda="conda info --envs";
+alias python="python3";
+
+alias newvenv="python3 -m venv env";
+
+## postgres
+alias winpsql="psql -h winhost -p 5432 -U postgres";
+alias opsql="sudo -u postgres psql";
+
+## glpk
+modsol() {
+    /mnt/c/Projects/computational-microeconomics/glpk/examples/glpsol --math $1 --output $2
+}
+
+lpsol() {
+    /mnt/c/Projects/computational-microeconomics/glpk/examples/glpsol --cpxlp $1 --output $2
+}
+
 ## fun stuff
 alias starwars="telnet towel.blinkenlights.nl";
 alias fbm="fb-messenger-cli";
+
+alias open="explorer.exe";
+alias chrome="/mnt/c/Program\ Files/Google/Chrome/Application/chrome.exe";
+
+## obsidian
+alias obpre="code /mnt/c/Users/13236/Documents/Zettelkasten/preamble.sty"
+
+## haskell
+alias haskell="stack ghci"
+alias cabal="stack cabal"
